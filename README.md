@@ -13,7 +13,7 @@ A node which produces ores for Minetest
 ## Usage
 
 For optimal performance of a orevein place a block down then place the orevein,
- on top them break the block under the orevein,
+ on top then break the block under the orevein,
  make sure there is a 3x3x3 space with the orevein in the middle of that.
 
 ![usage](usage.gif)

@@ -63,8 +63,6 @@ local make_ore = function (pos, elapsed)
 end
 
 -- Now we use all this to make our machine
-local mod_name = "oreveins_"
-local extent = ".png"
 local grouping = nil
 local sounding = nil
 if oreveins.GAMEMODE == "MCL2" or oreveins.GAMEMODE == "MCL5" then
