@@ -67,14 +67,14 @@ local grouping = nil
 local sounding = nil
 if oreveins.GAMEMODE == "MCL2" or oreveins.GAMEMODE == "MCL5" then
     local mcl_sounds = rawget(_G, "mcl_sounds") or oreveins.tools.error("Failed obtaining mcl_sounds")
-    grouping = {pickaxey=1, building_block=1, material_stone=1}
+    grouping = {handy=1, axey=1, pickaxey=1, shovely=1}
     sounding = mcl_sounds.node_sound_metal_defaults()
 elseif oreveins.GAMEMODE == "MTG" then
     local default = rawget(_G, "default") or oreveins.tools.error("Failed obtaining default for sounds")
-    grouping = {cracky = 3}
+    grouping = {oddly_breakable_by_hand = 1}
     sounding = default.node_sound_metal_defaults()
 else
-    grouping = {cracky = 3, pickaxey=1, building_block=1, material_stone=1}
+    grouping = {oddly_breakable_by_hand = 1, handy=1, axey=1, pickaxey=1, shovely=1}
 end
 
 -- Registers a node which passively produces ores (Returns if successful)
@@ -101,6 +101,9 @@ oreveins.register_orevein = function (itemstring, maxtime)
             texts.."^oreveins_overlay.png"
         },
         groups = grouping,
+        -- Ah MCL uses extra stuff
+        _mcl_blast_resistance = 2,
+		_mcl_hardness = 2,
         sounds = sounding,
         paramtype2 = "facedir",
         light_source = 1,
