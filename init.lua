@@ -39,30 +39,33 @@ dofile(oreveins.MODPATH.."/register.lua")
 -- Now register the ores
 if oreveins.GAMEMODE == "MTG" then
     oreveins.register_orevein("default:stone_with_coal", 15)
-    oreveins.register_orevein("default:stone_with_iron", 35)
-    oreveins.register_orevein("default:stone_with_copper", 35)
-    oreveins.register_orevein("default:stone_with_tin", 35)
-    oreveins.register_orevein("default:stone_with_gold", 35)
+    oreveins.register_orevein("default:stone_with_iron", 20)
+    oreveins.register_orevein("default:stone_with_copper", 25)
+    oreveins.register_orevein("default:stone_with_tin", 30)
+    oreveins.register_orevein("default:stone_with_gold", 30)
     oreveins.register_orevein("default:stone_with_mese", 45)
-    oreveins.register_orevein("default:stone_with_diamond", 60)
+    oreveins.register_orevein("default:stone_with_diamond", 50)
     if minetest.get_modpath("technic") ~= nil then
         oreveins.register_orevein("technic:mineral_zinc", 45)
         oreveins.register_orevein("technic:mineral_lead", 45)
-        oreveins.register_orevein("technic:mineral_chromium", 60)
+        oreveins.register_orevein("technic:mineral_chromium", 50)
         oreveins.register_orevein("technic:mineral_uranium", 70)
-        oreveins.register_orevein("technic:mineral_sulfur", 70)
+        oreveins.register_orevein("technic:mineral_sulfur", 55)
     end
     if minetest.get_modpath("moreores") ~= nil then
         oreveins.register_orevein("moreores:mineral_silver", 45)
-        oreveins.register_orevein("moreores:mineral_mithril", 50)
+        oreveins.register_orevein("moreores:mineral_mithril", 55)
         oreveins.register_orevein("moreores:mineral_tin", 45)
     end
 elseif oreveins.GAMEMODE == "MCL5" or oreveins.GAMEMODE == "MCL2" then
     oreveins.register_orevein("mcl_core:stone_with_coal", 15)
-    oreveins.register_orevein("mcl_core:stone_with_iron", 35) -- In MCL2 iron ore drops itself, thus in MCL2 the orevein is actually quite cheap
-    oreveins.register_orevein("mcl_core:stone_with_gold", 35) -- In MCL2 gold ore drops itself, thus in MCL2 the orevein is actually quite cheap
-    oreveins.register_orevein("mcl_core:stone_with_lapis", 45)
-    oreveins.register_orevein("mcl_core:stone_with_redstone", 45)
+    oreveins.register_orevein("mcl_core:stone_with_iron", 20) -- In MCL2 iron ore drops itself, thus in MCL2 the orevein is actually quite cheap
+    oreveins.register_orevein("mcl_core:stone_with_gold", 25) -- In MCL2 gold ore drops itself, thus in MCL2 the orevein is actually quite cheap
+    oreveins.register_orevein("mcl_core:stone_with_lapis", 35)
+    oreveins.register_orevein("mcl_core:stone_with_redstone", 35)
     oreveins.register_orevein("mcl_core:stone_with_diamond", 60)
     oreveins.register_orevein("mcl_core:stone_with_emerald", 60)
+    if minetest.get_modpath("mcl_copper") ~= nil then
+        oreveins.register_orevein("mcl_copper:stone_with_copper", 30)
+    end
 end

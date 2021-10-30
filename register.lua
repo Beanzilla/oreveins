@@ -67,14 +67,14 @@ local grouping = nil
 local sounding = nil
 if oreveins.GAMEMODE == "MCL2" or oreveins.GAMEMODE == "MCL5" then
     local mcl_sounds = rawget(_G, "mcl_sounds") or oreveins.tools.error("Failed obtaining mcl_sounds")
-    grouping = {handy=3}
+    grouping = {pickaxey=1, building_block=1, material_stone=1}
     sounding = mcl_sounds.node_sound_metal_defaults()
 elseif oreveins.GAMEMODE == "MTG" then
     local default = rawget(_G, "default") or oreveins.tools.error("Failed obtaining default for sounds")
-    grouping = {crumbly = 3}
+    grouping = {cracky = 3}
     sounding = default.node_sound_metal_defaults()
 else
-    grouping = {crumbly = 3, handy=3}
+    grouping = {cracky = 3, pickaxey=1, building_block=1, material_stone=1}
 end
 
 -- Registers a node which passively produces ores (Returns if successful)
