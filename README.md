@@ -30,5 +30,6 @@ For optimal performance of a orevein place a block down then place the orevein,
 * MCL2 ([mcl_core](https://git.minetest.land/MineClone2/MineClone2)) and MCL5 ([mcl_core](https://git.minetest.land/MineClone5/MineClone5))
 * MTG EXTERN ([technic](https://github.com/minetest-mods/technic)) \*
 * MTG EXTERN ([moreores](https://github.com/minetest-mods/moreores)) \*
+* MCL EXTERN ([mcl_copper](https://github.com/NO411/mcl_copper)) \*
 
 \* These mods are not directly part of a game but I added support for anyway (They can be game specific, I.E. Technic only works in MTG)
