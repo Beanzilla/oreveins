@@ -7,6 +7,8 @@ A node which produces ores for Minetest
 
 This mod uses textures from other mods/games with an overlay on top of them.
 
+The textures/oreveins_overlay.png image is MIT however most of the mods/games this mod by default can interface/use provide a different license.
+
 ![screenshot](screenshot.png)
 
 ## What's in the box
