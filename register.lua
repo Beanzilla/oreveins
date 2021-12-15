@@ -3,6 +3,8 @@
 local make_ore = function (pos, elapsed)
     local meta = minetest.get_meta(pos)
     local ore = meta:get_string("product")
+    local size = meta:get_int("size")
+    meta:set_int("time", 0) -- Reset internal time
     
     -- local a = {x = pos.x - 1, y = pos.y - 1, z = pos.z - 1}
     -- local b = {x = pos.x, y = pos.y - 1, z = pos.z - 1}
@@ -41,8 +43,15 @@ local make_ore = function (pos, elapsed)
     table.insert(positons, vector.subtract(pos, vector.new(0, -1, 1)))
     table.insert(positons, vector.subtract(pos, vector.new(1, -1, 1)))
 
+    local pos_add = vector.add(pos, vector.new(size, size, size))
+    local pos_sub = vector.subtract(pos, vector.new(size, size, size))
+
+    local air_nodes = minetest.find_nodes_in_area(pos_add, pos_sub, {"air"}, true)
+    air_nodes = air_nodes["air"]
+    --oreveins.tools.log("find_nodes_in_area found "..minetest.serialize(air_nodes))
+
     -- Iterate over all positions finding a position which is air/empty
-    for indx, sec in pairs(positons) do
+    for indx, sec in pairs(air_nodes) do
         local node = minetest.get_node_or_nil(sec)
         local name = "nil"
         if node ~= nil then
@@ -112,14 +121,23 @@ oreveins.register_orevein = function (itemstring, maxtime)
             local meta = minetest.get_meta(pos)
             meta:set_string("product", itemstring)
             meta:set_int("max_time", maxtime)
+            meta:set_int("time", 0)
+            meta:set_int("size", 2)
+            meta:set_string("infotext", name.." Vein ("..tostring(maxtime)..")")
         end,
         after_place_node = function (pos, placer, itemstack)
             local meta = minetest.get_meta(pos)
             local timer = minetest.get_node_timer(pos)
-            timer:start(meta:get_int("max_time"))
+            timer:start(1)
         end,
         on_timer = function (pos, elapsed)
-            return make_ore(pos, elapsed)
+            local meta = minetest.get_meta(pos)
+            meta:set_string("infotext", name.." Vein ("..tostring(meta:get_int("max_time")-meta:get_int("time"))..")")
+            if(meta:get_int("time")+1 > meta:get_int("max_time")) then
+                return make_ore(pos, elapsed)
+            end
+            meta:set_int("time", meta:get_int("time")+1)
+            return true
         end
     })
     if oreveins.ir ~= nil and oreveins.blacklist_replication then
