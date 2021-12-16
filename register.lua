@@ -2,51 +2,17 @@
 -- Places a node within a 3x3x3 around the main node
 local make_ore = function (pos, elapsed)
     local meta = minetest.get_meta(pos)
-    local ore = meta:get_string("product")
+    --oreveins.tools.log("make_ore "..minetest.serialize(oreveins._internal.oreos[meta:get_string("id")]))
+    local ore = oreveins._internal.oreos[meta:get_string("id")]["nodes"][math.random(#oreveins._internal.oreos[meta:get_string("id")]["nodes"])]
     local size = meta:get_int("size")
     meta:set_int("time", 0) -- Reset internal time
-    
-    -- local a = {x = pos.x - 1, y = pos.y - 1, z = pos.z - 1}
-    -- local b = {x = pos.x, y = pos.y - 1, z = pos.z - 1}
-    -- local c = {x = pos.x + 1, y = pos.y - 1, z = pos.z - 1}
-    local positons = {}
-    -- Bottom 9
-    table.insert(positons, vector.subtract(pos, vector.new(-1, 1, -1)))
-    table.insert(positons, vector.subtract(pos, vector.new(0, 1, -1)))
-    table.insert(positons, vector.subtract(pos, vector.new(1, 1, -1)))
-    table.insert(positons, vector.subtract(pos, vector.new(-1, 1, 0)))
-    table.insert(positons, vector.subtract(pos, vector.new(0, 1, 0)))
-    table.insert(positons, vector.subtract(pos, vector.new(1, 1, 0)))
-    table.insert(positons, vector.subtract(pos, vector.new(-1, 1, 1)))
-    table.insert(positons, vector.subtract(pos, vector.new(0, 1, 1)))
-    table.insert(positons, vector.subtract(pos, vector.new(1, 1, 1)))
-
-    -- Center 8
-    table.insert(positons, vector.subtract(pos, vector.new(-1, 0, -1)))
-    table.insert(positons, vector.subtract(pos, vector.new(0, 0, -1)))
-    table.insert(positons, vector.subtract(pos, vector.new(1, 0, -1)))
-    table.insert(positons, vector.subtract(pos, vector.new(-1, 0, 0)))
-    -- table.insert(positons, vector.subtract(pos, vector.new(0, 0, 0))) -- Since this one is obviously pos, which is us
-    table.insert(positons, vector.subtract(pos, vector.new(1, 0, 0)))
-    table.insert(positons, vector.subtract(pos, vector.new(-1, 0, 1)))
-    table.insert(positons, vector.subtract(pos, vector.new(0, 0, 1)))
-    table.insert(positons, vector.subtract(pos, vector.new(1, 0, 1)))
-
-    -- Top 9
-    table.insert(positons, vector.subtract(pos, vector.new(-1, -1, -1)))
-    table.insert(positons, vector.subtract(pos, vector.new(0, -1, -1)))
-    table.insert(positons, vector.subtract(pos, vector.new(1, -1, -1)))
-    table.insert(positons, vector.subtract(pos, vector.new(-1, -1, 0)))
-    table.insert(positons, vector.subtract(pos, vector.new(0, -1, 0)))
-    table.insert(positons, vector.subtract(pos, vector.new(1, -1, 0)))
-    table.insert(positons, vector.subtract(pos, vector.new(-1, -1, 1)))
-    table.insert(positons, vector.subtract(pos, vector.new(0, -1, 1)))
-    table.insert(positons, vector.subtract(pos, vector.new(1, -1, 1)))
 
     local pos_add = vector.add(pos, vector.new(size, size, size))
     local pos_sub = vector.subtract(pos, vector.new(size, size, size))
 
     local air_nodes = minetest.find_nodes_in_area(pos_add, pos_sub, {"air"}, true)
+    if air_nodes == nil then return true end -- It's empty so let's treat it like we've already placed a node.
+
     air_nodes = air_nodes["air"]
     --oreveins.tools.log("find_nodes_in_area found "..minetest.serialize(air_nodes))
 
@@ -87,25 +53,32 @@ else
 end
 
 -- Registers a node which passively produces ores (Returns if successful)
-oreveins.register_orevein = function (itemstring, maxtime)
-    if minetest.registered_nodes[itemstring] == nil then
+oreveins.make_orevein = function (id, use_id_as_name)
+    if oreveins._internal.oreos[id] == nil then
         oreveins.tools.log("Invalid node "..itemstring.." for creating orevein.")
         return false
     end
+    local itemstring = oreveins._internal.oreos[id]["nodes"][1]
     local itemstring_split = oreveins.tools.split(itemstring, ":")
     local from_mod = itemstring_split[1]
     local item = itemstring_split[2]
     local item_split = oreveins.tools.split(item, "_")
     local name = "ore"
     name = item_split[ #item_split ]
+    if use_id_as_name ~= nil then
+        name = id
+    end
     name = oreveins.tools.firstToUpper(name)
     local texts = ItemStack(itemstring.." 1"):get_definition().tiles[1] or oreveins.tools.error("Failed obtaining texture of "..itemstring)
-    minetest.register_node("oreveins:"..item, {
+    minetest.register_node("oreveins:"..id, {
         short_description = name.." Vein",
-        description = name.." Vein\n"..itemstring,
+        description = name.." Vein\n"
+            .."Produces: "..tostring(#oreveins._internal.oreos[id]["nodes"]).." nodes\n"
+            .."Size: "..tostring(oreveins._internal.oreos[id]["size"]).." cubed\n"
+            .."Speed: "..tostring(oreveins._internal.oreos[id]["speed"]).." seconds",
         _doc_items_long_desc = oreveins.S("Oreveins produce ores over a period of time, this allows the world to remain more or less untouched, since oreveins produce an unlimited amount"),
-        _dock_items_usagehelp = oreveins.S("Place a node on the ground, place a orevein on top of that block then remove that block (under the orevein), wait till it produces. keep nodes away from the orevein to allow placeing ores there"),
-        _dock_items_hidden=false,
+        _doc_items_usagehelp = oreveins.S("Place a node on the ground, place a orevein on top of that block then remove that block (under the orevein), wait till it produces. keep nodes away from the orevein to allow placeing ores there"),
+        _doc_items_hidden=false,
         tiles = {
             texts.."^oreveins_overlay.png"
         },
@@ -119,10 +92,11 @@ oreveins.register_orevein = function (itemstring, maxtime)
         drop = "oreveins:"..item,
         on_construct = function (pos)
             local meta = minetest.get_meta(pos)
+            meta:set_string("id", id)
             meta:set_string("product", itemstring)
-            meta:set_int("max_time", maxtime)
+            meta:set_int("max_time", oreveins._internal.oreos[id]["speed"])
             meta:set_int("time", 0)
-            meta:set_int("size", 2)
+            meta:set_int("size", oreveins._internal.oreos[id]["size"])
             meta:set_string("infotext", name.." Vein ("..tostring(maxtime)..")")
         end,
         after_place_node = function (pos, placer, itemstack)
@@ -141,9 +115,9 @@ oreveins.register_orevein = function (itemstring, maxtime)
         end
     })
     if oreveins.ir ~= nil and oreveins.blacklist_replication then
-        oreveins.ir.bl_add("oreveins:"..item)
+        oreveins.ir.bl_add("oreveins:"..id)
     end
-    if oreveins.craftable then
+    --[[if oreveins.craftable then
         minetest.register_craft({
             output = "oreveins:"..item.." 1",
             recipe = {
@@ -152,11 +126,29 @@ oreveins.register_orevein = function (itemstring, maxtime)
                 {itemstring, itemstring, itemstring}
             }
         })
-    end
+    end]]
     minetest.register_craft({
         type = "fuel",
         recipe = "oreveins:"..item,
         burntime = 600 -- 10 minutes
     })
     return true
+end
+
+-- Calls make_orevein for each vein id in _internals
+oreveins.make_veins = function()
+    local oreos = oreveins._internal.oreos
+    local mades = 0
+    oreveins.tools.log(minetest.serialize(oreos))
+    for idx, cookie in pairs(oreos) do
+        oreveins.tools.log("I want a "..idx)
+        if idx ~= "orepack" then
+            oreveins.make_orevein(idx, false)
+            mades = mades + 1
+        else
+            oreveins.make_orevein(idx, true)
+            mades = mades + 1
+        end
+    end
+    oreveins.tools.log("Made "..tostring(mades).." oreveins.")
 end

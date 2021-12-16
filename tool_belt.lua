@@ -25,6 +25,14 @@ tools.split = function (inputstr, sep)
     return t
 end
 
+-- Returns true or false if search string is in inputstring
+tools.contains = function(inputstr, search)
+    if string.match(inputstr, search) then
+        return true
+    end
+    return false
+end
+
 -- Converts the given string so the first letter is uppercase (Returns the converted string)
 tools.firstToUpper = function (str)
     return (str:gsub("^%l", string.upper))
