@@ -30,7 +30,11 @@ local make_ore = function (pos, elapsed)
             if oreveins.log_debug then
                 oreveins.tools.log("I built a "..ore.." here.")
             end
-            minetest.swap_node(sec, {name = ore})
+            if ore ~= "technic:mineral_uranium" then
+                minetest.swap_node(sec, {name = ore})
+            else
+                minetest.swap_node(sec, {name = "oreveins:mineral_uranium"})
+            end
             return true
         end
     end
@@ -97,12 +101,42 @@ oreveins.make_orevein = function (id, use_id_as_name)
             meta:set_int("max_time", oreveins._internal.oreos[id]["speed"])
             meta:set_int("time", 0)
             meta:set_int("size", oreveins._internal.oreos[id]["size"])
+            meta:set_int("upgrade_size", 0)
+            meta:set_int("upgrade_speed", 0)
+            meta:set_int("breakable", 1)
             meta:set_string("infotext", name.." Vein ("..tostring(maxtime)..")")
         end,
         after_place_node = function (pos, placer, itemstack)
             local meta = minetest.get_meta(pos)
             local timer = minetest.get_node_timer(pos)
             timer:start(1)
+        end,
+        after_dig_node = function(pos, oldnode, oldnodemeta, digger)
+            if oldnode == nil then return nil end
+            if oldnodemeta == nil then return nil end
+            local size_ups = oldnodemeta.upgrade_size or 0
+            local speed_ups = oldnodemeta.upgrade_speed or 0
+            local p_inv = minetest.get_inventory({type="player", name=digger:get_player_name()})
+            local up_size = ItemStack("oreveins:upgrade_size") or 0
+            local up_speed = ItemStack("oreveins:upgrade_speed") or 0
+            for i=0,size_ups,1 do
+                if p_inv:room_for_item("main", up_size) then
+                    p_inv:add_item("main", up_size)
+                else
+                    break
+                end
+            end
+            for i=0,speed_ups,1 do
+                if p_inv:room_for_item("main", up_speed) then
+                    p_inv:add_item("main", up_speed)
+                else
+                    break
+                end
+            end
+        end,
+        can_dig = function(pos, player)
+            local meta = minetest.get_meta(pos)
+            return meta:get_int("breakable") ~= 1
         end,
         on_timer = function (pos, elapsed)
             local meta = minetest.get_meta(pos)
@@ -139,9 +173,9 @@ end
 oreveins.make_veins = function()
     local oreos = oreveins._internal.oreos
     local mades = 0
-    oreveins.tools.log(minetest.serialize(oreos))
+    --oreveins.tools.log(minetest.serialize(oreos))
     for idx, cookie in pairs(oreos) do
-        oreveins.tools.log("I want a "..idx)
+        --oreveins.tools.log("I want a "..idx)
         if idx ~= "orepack" then
             oreveins.make_orevein(idx, false)
             mades = mades + 1
@@ -151,4 +185,119 @@ oreveins.make_veins = function()
         end
     end
     oreveins.tools.log("Made "..tostring(mades).." oreveins.")
+end
+
+local upgrade_it = function(itemstack, placer, pointed)
+    --oreveins.tools.log("GET: We don't know, "..placer:get_player_name()..", "..minetest.serialize(pointed))
+    if pointed == nil then
+        oreveins.tools.log("Pointed is nil!")
+        return itemstack
+    end
+    if pointed.x == nil or pointed.y == nil or pointed.z == nil then
+        oreveins.tools.log("Pointed contains nil!")
+        return itemstack
+    end
+    local pmeta = minetest.get_meta(pointed)
+    local speed = pmeta:get_int("speed") or 0
+    local size = pmeta:get_int("size") or 0
+    if itemstack.name == "oreveins:upgrade_size" and size < oreveins.max_size then
+        pmeta:set_int("size", size+1)
+        pmeta:set_int("upgrade_size", pmeta:get_int("upgrade_size")+1)
+        oreveins.tools.log("Upgraded "..minetest.pos_to_string(pointed).." size to "..tostring(size+1))
+    elseif itemstack.name == "oreveins:upgrade_speed" and speed > oreveins.min_speed then
+        pmeta:set_int("speed", speed-1)
+        pmeta:set_int("upgrade_speed", pmeta:get_int("upgrade_speed")+1)
+        oreveins.tools.log("Upgraded "..minetest.pos_to_string(pointed).." speed to "..tostring(speed-1))
+    else
+        oreveins.tools.log("Can't Upgrade "..minetest.pos_to_string(pointed).." size is "..tostring(size).." speed is "..tostring(speed))
+        return nil
+    end
+    itemstack:take_item()
+    return itemstack
+end
+
+minetest.register_craftitem("oreveins:upgrade_size", {
+    short_description = "Size Upgrade",
+    description = "Use this on a vein to cause it to increase size.",
+    inventory_image = "oreveins_upgrade_size.png",
+    groups = {oreveins_upgrade=1, upgrade_size=1},
+    on_place = function(is, p, po)
+        return upgrade_it(is, p, po)
+    end,
+    on_use = function(is, p, po)
+        return upgrade_it(is, p, po)
+    end
+})
+
+minetest.register_craftitem("oreveins:upgrade_speed", {
+    short_description = "Speed Upgrade",
+    description = "Use this on a vein to cause it to spawn ores faster.",
+    inventory_image = "oreveins_upgrade_speed.png",
+    groups = {oreveins_upgrade=1, upgrade_speed=1},
+    on_place = function(is, p, po)
+        return upgrade_it(is, p, po)
+    end,
+    on_use = function(is, p, po)
+        return upgrade_it(is, p, po)
+    end
+})
+
+minetest.register_craftitem("oreveins:ic_card", {
+    description = "IC Card",
+    inventory_image = "oreveins_ic_card.png",
+    groups = {oreveins_ic=1}
+})
+minetest.register_craftitem("oreveins:driver", {
+    description = "Driver",
+    inventory_image = "oreveins_driver.png",
+    groups = {oreveins_driver=1}
+})
+
+local iron = "default:steel_ingot"
+local gold = "default:gold_ingot"
+local diamond = "default:diamond"
+local mese = "default:mese_crystal"
+local driver = "oreveins:driver"
+local ic_card = "oreveins:ic_card"
+
+if oreveins.GAMEMODE == "MCL2" or oreveins.GAMEMODE == "MCL5" then
+    iron = "mcl_core:iron_ingot"
+    gold = "mcl_core:gold_ingot"
+    diamond = "mcl_core:diamond"
+    mese = "mesecons:redstone"
+end
+
+if oreveins.craftable then
+    minetest.register_craft({
+        output = ic_card,
+        recipe = {
+            {iron, gold, iron},
+            {iron, mese, iron},
+            {iron, gold, iron}
+        },
+    })
+    minetest.register_craft({
+        output = driver,
+        recipe = {
+            {iron, diamond, iron},
+            {iron, mese, iron},
+            {iron, gold, iron}
+        },
+    })
+    minetest.register_craft({
+        output = "oreveins:upgrade_size",
+        recipe = {
+            {iron, driver, iron},
+            {iron, ic_card, iron},
+            {iron, gold, iron}
+        },
+    })
+    minetest.register_craft({
+        output = "oreveins:upgrade_speed",
+        recipe = {
+            {iron, ic_card, iron},
+            {iron, ic_card, iron},
+            {iron, gold, iron}
+        },
+    })
 end

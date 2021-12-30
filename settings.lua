@@ -9,3 +9,9 @@ oreveins.craftable = true
 oreveins.log_debug = false
 
 -- Check the README.md file for the URL link to the repo.
+
+-- How big can all oreveins become
+oreveins.max_size = 3
+
+-- How fast can all orveins become
+oreveins.min_speed = 5

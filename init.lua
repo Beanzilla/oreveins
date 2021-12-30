@@ -85,6 +85,7 @@ if oreveins.GAMEMODE == "MTG" then
         oreveins.register_orevein("technic:mineral_lead", {"technic:mineral_lead"}, 1, 45)
         oreveins.register_orevein("technic:mineral_chromium", {"technic:mineral_chromium"}, 1, 50)
         oreveins.register_orevein("technic:mineral_uranium", {"technic:mineral_uranium"}, 1, 70)
+        dofile(oreveins.MODPATH.."/safety.lua")
         oreveins.register_orevein("technic:mineral_sulfur", {"technic:mineral_sulfur"}, 1, 55)
         oreveins.register_orevein("orepack", {
                 "default:stone_with_coal",

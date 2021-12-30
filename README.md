@@ -9,6 +9,10 @@ This mod uses textures from other mods/games with an overlay on top of them.
 
 The textures/oreveins_overlay.png image is MIT however most of the mods/games this mod by default can interface/use provide a different license.
 
+## Safety Update
+
+* This mod now places a safer version of technic's uranium ore (removed radioactivity), it's textures are different to indicate it is not the same ore.
+
 ![screenshot](screenshot.png)
 
 ## What's in the box
