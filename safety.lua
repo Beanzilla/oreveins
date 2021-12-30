@@ -17,7 +17,7 @@ minetest.register_node( ":technic:mineral_uranium", {
 if oreveins.GAMEMODE == "MTG" then
     local default = rawget(_G, "default") or nil
     -- Not radioactive, thus safer
-    minetest.register_node("oreviens:mineral_uranium", {
+    minetest.register_node("oreveins:mineral_uranium", {
         description = oreveins.S("Uranium Ore"),
         tiles = { "oreveins_stone.png^oreveins_uranium.png" },
         is_ground_content = true,
