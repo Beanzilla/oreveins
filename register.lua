@@ -136,7 +136,7 @@ oreveins.make_orevein = function (id, use_id_as_name)
         end,
         can_dig = function(pos, player)
             local meta = minetest.get_meta(pos)
-            return meta:get_int("breakable") ~= 1
+            return meta:get_int("breakable") == 1
         end,
         on_timer = function (pos, elapsed)
             local meta = minetest.get_meta(pos)
