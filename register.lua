@@ -33,7 +33,7 @@ local make_ore = function (pos, elapsed)
             if ore ~= "technic:mineral_uranium" then
                 minetest.swap_node(sec, {name = ore})
             else
-                minetest.swap_node(sec, {name = "oreveins:mineral_uranium"})
+                minetest.swap_node(sec, {name = "oreveins:uranium_ore"})
             end
             return true
         end
