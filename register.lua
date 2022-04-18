@@ -15,6 +15,9 @@ local make_ore = function (pos, elapsed)
 
     air_nodes = air_nodes["air"]
     --oreveins.tools.log("find_nodes_in_area found "..minetest.serialize(air_nodes))
+    if air_nodes == nil then return true end -- Prevents after our change from blowing up
+    if #air_nodes == 0 then return true end  -- Ensure we don't blow up when itterating over nil/empty table
+    if air_nodes == {} then return true end  -- The quest to prevent blow up
 
     -- Iterate over all positions finding a position which is air/empty
     for indx, sec in pairs(air_nodes) do
